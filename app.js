@@ -125,13 +125,13 @@ else window.addEventListener('load', relatarSeLento);
 // admin_level >= 1 identifica administrador, mesmo criterio usado pelo menu do
 // site. Consultado em /api/me, que e a fonte autoritativa (nao confiar em nada
 // guardado no aparelho para decidir permissao).
-async function ehAdministrador() {
+async function nivelAdministrador() {
   try {
     const r = await apiFetch('/me', { cache: 'no-store' });
     const d = await r.json().catch(() => null);
-    return !!(r.ok && d && typeof d.admin_level === 'number' && d.admin_level >= 1);
+    return r.ok && d && typeof d.admin_level === 'number' ? d.admin_level : 0;
   } catch (_) {
-    return false;
+    return 0;
   }
 }
 
@@ -219,12 +219,14 @@ form.addEventListener('submit', async (event) => {
     if (typeof data.app_token === 'string') localStorage.setItem(APP_TOKEN_KEY, data.app_token);
     // Por enquanto o aplicativo e exclusivo de administradores. A fonte
     // autoritativa e /api/me (mesmo criterio do menu do site: admin_level >= 1).
-    if (!(await ehAdministrador())) {
+    const adminLevel = await nivelAdministrador();
+    if (adminLevel < 1) {
       try { await apiFetch('/logout', { method: 'POST' }); } catch (_) {}
       localStorage.removeItem(APP_TOKEN_KEY);
       throw new Error('Aplicativo disponível apenas para administradores.');
     }
-    enableInstall(data.user);
+    // Persistido localmente para a proxima abertura funcionar mesmo offline.
+    enableInstall({ ...data.user, admin_level: adminLevel });
   } catch (error) {
     status.dataset.status = 'error';
     status.textContent = error.message || 'Falha de conexão. Tente novamente.';
