@@ -48,6 +48,13 @@ if (document.readyState === 'complete') agendarVideoDecorativo();
 else window.addEventListener('load', agendarVideoDecorativo);
 
 const API = 'https://beta.xdcatalogo.com.br/backend/public/api';
+const APP_TOKEN_KEY = 'xd_app_token';
+function apiFetch(path, options = {}) {
+  const headers = new Headers(options.headers || {});
+  const token = localStorage.getItem(APP_TOKEN_KEY);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  return fetch(`${API}${path}`, { ...options, headers, credentials: 'include' });
+}
 
 // ===================== DIAGNOSTICO TEMPORARIO DE ABERTURA =====================
 // Mede a abertura REAL no aparelho (principalmente iPhone) e envia um resumo
@@ -92,8 +99,8 @@ async function enviarDiagnostico() {
     try { sessao = JSON.parse(localStorage.getItem('xd_session') || 'null'); } catch (_) {}
     let envio = 'nao tentado';
     try {
-      const resp = await fetch(`${API}/client-errors`, {
-        method: 'POST', credentials: 'include', keepalive: true,
+      const resp = await apiFetch('/client-errors', {
+        method: 'POST', keepalive: true,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'diagnostico-abertura', pageId: 'APPCEL', message: 'v' + VERSAO_APP + ' | ' + msg,
           source: navigator.userAgent.slice(0, 180), userEmail: (sessao && sessao.email) || '' })
@@ -120,7 +127,7 @@ else window.addEventListener('load', relatarSeLento);
 // guardado no aparelho para decidir permissao).
 async function ehAdministrador() {
   try {
-    const r = await fetch(`${API}/me`, { credentials: 'include', cache: 'no-store' });
+    const r = await apiFetch('/me', { cache: 'no-store' });
     const d = await r.json().catch(() => null);
     return !!(r.ok && d && typeof d.admin_level === 'number' && d.admin_level >= 1);
   } catch (_) {
@@ -169,13 +176,15 @@ installButton.addEventListener('click', async () => {
 
 document.querySelector('#logout').addEventListener('click', async () => {
   localStorage.removeItem('xd_session');
-  try { await fetch(`${API}/logout`, { method: 'POST', credentials: 'include' }); } catch (_) {}
+  try { await apiFetch('/logout', { method: 'POST' }); } catch (_) {}
+  localStorage.removeItem(APP_TOKEN_KEY);
   window.location.reload();
 });
 
 document.querySelector('#remove-app').addEventListener('click', async () => {
   localStorage.removeItem('xd_session');
-  try { await fetch(`${API}/logout`, { method: 'POST', credentials: 'include' }); } catch (_) {}
+  try { await apiFetch('/logout', { method: 'POST' }); } catch (_) {}
+  localStorage.removeItem(APP_TOKEN_KEY);
   if ('caches' in window) {
     for (const key of await caches.keys()) await caches.delete(key);
   }
@@ -200,16 +209,18 @@ form.addEventListener('submit', async (event) => {
   status.textContent = 'Verificando acesso...';
   try {
     const body = new URLSearchParams(new FormData(form));
-    const response = await fetch(`${API}/login`, {
-      method: 'POST', credentials: 'include',
+    const response = await apiFetch('/login', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }, body
     });
     const data = await response.json();
     if (!response.ok || data.ok !== true || !data.user) throw new Error(data.message || 'Não foi possível entrar.');
+    if (typeof data.app_token === 'string') localStorage.setItem(APP_TOKEN_KEY, data.app_token);
     // Por enquanto o aplicativo e exclusivo de administradores. A fonte
     // autoritativa e /api/me (mesmo criterio do menu do site: admin_level >= 1).
     if (!(await ehAdministrador())) {
-      try { await fetch(`${API}/logout`, { method: 'POST', credentials: 'include' }); } catch (_) {}
+      try { await apiFetch('/logout', { method: 'POST' }); } catch (_) {}
+      localStorage.removeItem(APP_TOKEN_KEY);
       throw new Error('Aplicativo disponível apenas para administradores.');
     }
     enableInstall(data.user);
@@ -235,7 +246,7 @@ if (!installedApp) {
   const validationController = new AbortController();
   window.setTimeout(() => validationController.abort(), 5000);
   const meT0 = performance.now();
-  fetch(`${API}/me`, { credentials: 'include', cache: 'no-store', signal: validationController.signal })
+  apiFetch('/me', { cache: 'no-store', signal: validationController.signal })
     .then(response => {
       DIAG.meMs = Math.round(performance.now() - meT0);
       DIAG.meStatus = response.status;
@@ -259,7 +270,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!refreshing) { refreshing = true; window.location.reload(); }
   });
-    navigator.serviceWorker.register('./service-worker.js?v=20260904-160000', { updateViaCache: 'none' })
+    navigator.serviceWorker.register('./service-worker.js?v=20260904-164500', { updateViaCache: 'none' })
     .then(registration => {
       const checkForUpdate = () => registration.update().catch(() => {});
       checkForUpdate();
