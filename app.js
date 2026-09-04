@@ -182,15 +182,16 @@ document.querySelector('#logout').addEventListener('click', async () => {
 });
 
 document.querySelector('#remove-app').addEventListener('click', async () => {
-  localStorage.removeItem('xd_session');
   try { await apiFetch('/logout', { method: 'POST' }); } catch (_) {}
-  localStorage.removeItem(APP_TOKEN_KEY);
+  // O PWA nao recebe aviso quando o icone e removido pelo sistema.
+  try { localStorage.clear(); sessionStorage.clear(); } catch (_) {}
   if ('caches' in window) {
     for (const key of await caches.keys()) await caches.delete(key);
   }
+  try { indexedDB.deleteDatabase('xd-app-files'); } catch (_) {}
   if ('serviceWorker' in navigator) {
     for (const registration of await navigator.serviceWorker.getRegistrations()) {
-      if (new URL(registration.scope).pathname === '/APPCEL/') await registration.unregister();
+      if (new URL(registration.scope).pathname === '/xd-celular/') await registration.unregister();
     }
   }
   const help = document.querySelector('#remove-help');
@@ -270,7 +271,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!refreshing) { refreshing = true; window.location.reload(); }
   });
-    navigator.serviceWorker.register('./service-worker.js?v=20260904-164500', { updateViaCache: 'none' })
+    navigator.serviceWorker.register('./service-worker.js?v=20260904-170500', { updateViaCache: 'none' })
     .then(registration => {
       const checkForUpdate = () => registration.update().catch(() => {});
       checkForUpdate();
