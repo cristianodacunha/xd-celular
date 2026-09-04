@@ -1,0 +1,10 @@
+{
+  "name": "XD Catálogos",
+  "short_name": "XD Catálogos",
+  "start_url": "/APPCEL/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "icons": [{ "src": "assets/img/helmet-icon.png", "sizes": "any", "type": "image/png", "purpose": "any maskable" }]
+}
