@@ -1,0 +1,10 @@
+# Arquivos locais e backups
+*.bak
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Nunca versionar segredos
+.env
+.env.*

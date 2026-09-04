@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070b14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="XD Catálogos">
+  <link rel="apple-touch-icon" href="assets/img/helmet-icon.png">
+  <link rel="manifest" href="manifest.webmanifest?v=20260827-025600">
+  <link rel="stylesheet" href="styles.css?v=20260901-100528">
+  <title>XD Catálogos</title>
+</head>
+<body>
+  <main class="login-shell">
+    <video id="intro-video" class="intro-video" muted loop playsinline preload="none" poster="assets/img/helmet-icon.png" data-video="assets/video/abertura.mp4" data-tipo="video/mp4"></video>
+    <div class="veil"></div>
+    <section class="login-card" aria-labelledby="titulo">
+      <img class="helmet" src="assets/img/helmet-icon.png" alt="Capacete XD">
+      <p class="eyebrow">XD CATÁLOGOS</p>
+      <h1 id="titulo">Tudo para sua moto,<br>mesmo sem internet.</h1>
+      <p id="subtitle" class="subtitle">Entre para acessar seus catálogos baixados.</p>
+      <form id="login-form">
+        <label>E-mail<input id="email" name="email" type="email" autocomplete="email" placeholder="seu@email.com" required></label>
+        <label>Senha<input id="password" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required></label>
+        <button id="enter" type="submit">Entrar</button>
+      </form>
+      <a id="support-link" class="first-access" href="/">Primeiro acesso ou recuperar senha</a>
+      <button id="install" class="install" type="button" hidden>Instalar XD Catálogos</button>
+      <p id="status" class="status" aria-live="polite">No primeiro uso, entre com seu e-mail cadastrado.</p>
+      <section id="app-menu" class="app-menu" hidden aria-label="Catálogos">
+        <p class="eyebrow">SEU CATÁLOGO</p>
+        <a class="catalog-shortcut xd" href="catalogo-xd/?v=20260901-102800"><span class="catalog-copy"><b>Catálogo XD</b><small>Peças, aplicações, cesta e arquivos offline</small></span><span class="catalog-arrow">›</span></a>
+        <button id="logout" class="link" type="button">Trocar conta</button>
+        <button id="remove-app" class="remove" type="button">Desinstalar deste celular</button>
+        <p id="remove-help" class="status" hidden></p>
+      </section>
+    </section>
+  </main>
+  <section id="installed-notice" class="installed-notice" hidden>
+    <img src="assets/img/helmet-icon.png" alt="XD Catálogos">
+    <h2>Instalação concluída.</h2>
+    <p>Abra o ícone <strong>XD Catálogos</strong> na tela inicial. Você já pode fechar este navegador.</p>
+    <button id="close-notice" type="button">Entendi</button>
+  </section>
+  <section id="ios-install-guide" class="ios-install-guide" hidden aria-label="Instalar no iPhone">
+    <img src="assets/img/helmet-icon.png" alt="XD Catálogos">
+    <h2>Instale o XD Catálogos</h2>
+    <p><b>1.</b> Toque em <strong>Compartilhar ⎋</strong> no rodapé do Safari.</p>
+    <p><b>2.</b> Toque em <strong>Adicionar à Tela de Início</strong>.</p>
+    <p><b>3.</b> Ative <strong>Abrir como App</strong>.</p>
+    <p><b>4.</b> Toque em <strong>Adicionar</strong>.</p>
+    <button id="close-ios-guide" type="button">Entendi</button>
+  </section>
+  <script src="app.js?v=20260901-100528"></script>
+</body>
+</html>
