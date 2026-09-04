@@ -1,8 +1,8 @@
 {
   "name": "XD Catálogos",
   "short_name": "XD Catálogos",
-  "start_url": "/APPCEL/",
-  "scope": "/APPCEL/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#070b14",
   "theme_color": "#070b14",
@@ -29,17 +29,17 @@
     {
       "name": "Buscar peças",
       "short_name": "Buscar",
-      "url": "/APPCEL/catalogo-xd/?atalho=busca"
+      "url": "./catalogo-xd/?atalho=busca"
     },
     {
       "name": "Minha cesta",
       "short_name": "Cesta",
-      "url": "/APPCEL/catalogo-xd/?atalho=cesta"
+      "url": "./catalogo-xd/?atalho=cesta"
     },
     {
       "name": "Catálogo offline",
       "short_name": "Offline",
-      "url": "/APPCEL/catalogo-xd/?atalho=offline"
+      "url": "./catalogo-xd/?atalho=offline"
     }
   ]
 }

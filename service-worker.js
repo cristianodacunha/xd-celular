@@ -1,4 +1,4 @@
-const CACHE = 'xd-appcel-v48';
+const CACHE = 'xd-appcel-v49';
 const ASSETS = ['./', './index.html', './styles.css?v=20260901-100528', './app.js?v=20260901-100528', './manifest.webmanifest?v=20260827-025600', './assets/img/helmet-icon.png'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
@@ -18,7 +18,8 @@ const NUNCA = () => new Promise(() => {});
 function guardavel(request) {
   if (request.method !== 'GET') return false;
   const p = new URL(request.url).pathname;
-  if (p.indexOf('/APPCEL/') === -1) return false;
+  const escopo = new URL(self.registration.scope).pathname;
+  if (!p.startsWith(escopo)) return false;
   if (p.indexOf('/catalogo-xd/') !== -1) return false;
   return true;
 }
