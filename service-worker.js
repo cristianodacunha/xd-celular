@@ -1,6 +1,6 @@
-const CACHE = 'xd-appcel-v54';
+const CACHE = 'xd-appcel-v55';
 const CATALOG_CACHE = 'xd-catalog-xd-v4';
-const ASSETS = ['./', './index.html', './catalogo-xd/?v=20260904-172000', './styles.css?v=20260901-100528', './app.js?v=20260904-170500', './manifest.webmanifest?v=20260827-025600', './assets/img/helmet-icon.png'];
+const ASSETS = ['./', './index.html', './catalogo-xd/?v=20260904-172000', './styles.css?v=20260901-100528', './app.js?v=20260904-173000', './manifest.webmanifest?v=20260827-025600', './assets/img/helmet-icon.png'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('xd-appcel-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));

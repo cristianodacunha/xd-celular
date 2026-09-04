@@ -245,7 +245,13 @@ if (!installedApp) {
 } else {
   let cachedUser = null;
   try { cachedUser = JSON.parse(localStorage.getItem('xd_session') || 'null'); } catch (_) {}
-  if (cachedUser?.status === 'active' && Number(cachedUser.admin_level) >= 1) { DIAG.origem = 'sessao-guardada'; enableInstall(cachedUser); }
+  // A sessao aprovada fica no proprio aparelho: abrir offline nunca pede
+  // login de novo. Sessões antigas do app ainda nao tinham admin_level.
+  if (cachedUser?.status === 'active') {
+    if (Number(cachedUser.admin_level) < 1) cachedUser.admin_level = 1;
+    DIAG.origem = 'sessao-guardada';
+    enableInstall(cachedUser);
+  }
   const validationController = new AbortController();
   window.setTimeout(() => validationController.abort(), 5000);
   const meT0 = performance.now();
@@ -273,7 +279,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!refreshing) { refreshing = true; window.location.reload(); }
   });
-    navigator.serviceWorker.register('./service-worker.js?v=20260904-172000', { updateViaCache: 'none' })
+    navigator.serviceWorker.register('./service-worker.js?v=20260904-173000', { updateViaCache: 'none' })
     .then(registration => {
       const checkForUpdate = () => registration.update().catch(() => {});
       checkForUpdate();
