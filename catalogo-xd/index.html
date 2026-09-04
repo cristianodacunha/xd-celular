@@ -547,6 +547,14 @@ nav button b{display:block;line-height:0}
   }
   function oneTypo(a,b){if(a===b)return true;if(a.length<4||Math.abs(a.length-b.length)>1)return false;var i=0,j=0,d=0;while(i<a.length&&j<b.length){if(a[i]===b[j]){i++;j++;continue}if(++d>1)return false;if(a.length>b.length)i++;else if(b.length>a.length)j++;else{i++;j++}}return d+(i<a.length||j<b.length?1:0)<=1}
   function fuzzyScore(x,words){return words.every(function(word){return (x._q||'').includes(word)||(word.length>=4&&(x._f||[]).some(function(token){return oneTypo(word,token)}))})?25:-1}
+  // No iPhone o Cache Storage grande pode acordar alguns segundos depois da tela.
+  function retryOfflineImage(img){
+    var attempt=Number(img.dataset.offlineRetry||0),src=img.dataset.offlineSrc||img.currentSrc||img.src;
+    img.dataset.offlineSrc=src;
+    if(attempt>=12)return;
+    img.dataset.offlineRetry=String(attempt+1);
+    window.setTimeout(function(){img.removeAttribute('src');window.setTimeout(function(){img.src=src},40)},Math.min(4000,1200+attempt*350));
+  }
   function applyFilters(){
     var clean=safeQuery($('#globalSearch').value),term=norm(clean).trim(),words=term.split(/[^A-Z0-9]+/).filter(function(word){return word.length>1}).slice(0,8),ranked=[];
     items.forEach(function(x,i){
@@ -564,7 +572,7 @@ nav button b{display:block;line-height:0}
     $('#results').innerHTML=list.map(function(x){
       var idx=items.indexOf(x),img=x.i?'thumbs/'+encodeURIComponent(x.i):'',added=!!basket[x.c],apps=formatApplicationsCard(x);
       return '<article class="card" data-item="'+idx+'">'
-        +'<div class="product-visual">'+(img?'<img loading="lazy" src="'+img+'" alt="'+escapeHtml(x.n||'Peça')+'" onerror="this.style.visibility=\'hidden\'">':'<div class="image-empty"></div>')+'</div>'
+        +'<div class="product-visual">'+(img?'<img loading="lazy" src="'+img+'" alt="'+escapeHtml(x.n||'Peça')+'" onerror="retryOfflineImage(this)">':'<div class="image-empty"></div>')+'</div>'
         +'<div class="card-content"><span class="card-category">'+escapeHtml(x.ca||'CATÁLOGO XD')+'</span><h3>'+escapeHtml(x.n||'Peça sem nome')+'</h3>'
         +'<div class="card-codes"><span><small>Código XD</small><b>'+escapeHtml(x.x||'—')+'</b></span><span><small>OEM</small><b>'+escapeHtml(x.o||'—')+'</b></span><span><small>SKU</small><b>'+escapeHtml(x.c||'—')+'</b></span></div>'
         +(apps?'<div class="card-apps"><b>Aplicações</b>'+apps+'</div>':'')

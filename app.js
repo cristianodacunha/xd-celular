@@ -271,7 +271,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!refreshing) { refreshing = true; window.location.reload(); }
   });
-    navigator.serviceWorker.register('./service-worker.js?v=20260904-170500', { updateViaCache: 'none' })
+    navigator.serviceWorker.register('./service-worker.js?v=20260904-172000', { updateViaCache: 'none' })
     .then(registration => {
       const checkForUpdate = () => registration.update().catch(() => {});
       checkForUpdate();
