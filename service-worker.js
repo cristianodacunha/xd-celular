@@ -1,4 +1,4 @@
-const CACHE = 'xd-appcel-v49';
+const CACHE = 'xd-appcel-v50';
 const ASSETS = ['./', './index.html', './styles.css?v=20260901-100528', './app.js?v=20260901-100528', './manifest.webmanifest?v=20260827-025600', './assets/img/helmet-icon.png'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
