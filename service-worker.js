@@ -1,5 +1,6 @@
-const CACHE = 'xd-appcel-v50';
-const ASSETS = ['./', './index.html', './styles.css?v=20260901-100528', './app.js?v=20260901-100528', './manifest.webmanifest?v=20260827-025600', './assets/img/helmet-icon.png'];
+const CACHE = 'xd-appcel-v51';
+const CATALOG_CACHE = 'xd-catalog-xd-v4';
+const ASSETS = ['./', './index.html', './catalogo-xd/', './styles.css?v=20260901-100528', './app.js?v=20260904-160000', './manifest.webmanifest?v=20260827-025600', './assets/img/helmet-icon.png'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('xd-appcel-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
@@ -38,6 +39,12 @@ function doCache(request) {
   return caches.open(CACHE).then(cache => cache.match(request)).catch(() => null);
 }
 
+function doCatalogCache(request) {
+  const path = new URL(request.url).pathname;
+  if (path.indexOf('/catalogo-xd/') === -1) return Promise.resolve(null);
+  return caches.open(CATALOG_CACHE).then(cache => cache.match(request)).catch(() => null);
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   event.respondWith((async () => {
@@ -45,8 +52,9 @@ self.addEventListener('fetch', event => {
     const medidas = { cacheMs: -1, redeMs: -1 };
     const rede = daRede(event.request).then(r => { medidas.redeMs = Date.now() - t0; return r; });
     const cache = doCache(event.request).then(r => { medidas.cacheMs = Date.now() - t0; return r; });
+    const catalogo = doCatalogCache(event.request);
     if (event.request.mode === 'navigate') {
-      event.waitUntil(Promise.allSettled([rede, cache]).then(async () => {
+      event.waitUntil(Promise.allSettled([rede, cache, catalogo]).then(async () => {
         const cs = await self.clients.matchAll({ includeUncontrolled: true });
         cs.forEach(cl => cl.postMessage({ tipo: 'diag-sw', cacheMs: medidas.cacheMs, redeMs: medidas.redeMs }));
       }));
@@ -54,11 +62,12 @@ self.addEventListener('fetch', event => {
     // corrida: cada lado so entra se tiver resposta de verdade
     const vencedor = await Promise.race([
       cache.then(r => r || NUNCA()),
+      catalogo.then(r => r || NUNCA()),
       rede.then(r => r || NUNCA()),
       new Promise(resolve => setTimeout(() => resolve(null), 15000))
     ]);
     if (vencedor) return vencedor;
-    const tardio = (await rede) || (await cache);
+    const tardio = (await rede) || (await catalogo) || (await cache);
     if (tardio) return tardio;
     if (event.request.mode === 'navigate') {
       const abrigo = await doCache(new Request('./index.html', { headers: event.request.headers }));
