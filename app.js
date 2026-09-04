@@ -47,7 +47,7 @@ function agendarVideoDecorativo() {
 if (document.readyState === 'complete') agendarVideoDecorativo();
 else window.addEventListener('load', agendarVideoDecorativo);
 
-const API = `${window.location.origin}/backend/public/api`;
+const API = 'https://beta.xdcatalogo.com.br/backend/public/api';
 
 // ===================== DIAGNOSTICO TEMPORARIO DE ABERTURA =====================
 // Mede a abertura REAL no aparelho (principalmente iPhone) e envia um resumo
